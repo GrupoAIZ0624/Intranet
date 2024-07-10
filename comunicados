@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed de Notícias</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .header {
+            width: 100%;
+            max-width: 1200px;
+            max-height: 300px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        .header img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: brightness(50%);
+        }
+        .header .header-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            font-size: 3vw; /* Tamanho responsivo baseado na largura da viewport */
+            font-weight: bold;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: rgba(0, 0, 0, 0.25);
+        }
+        .header .underline {
+            position: absolute;
+            width: 50%;
+            left: 25%;
+            top: calc(50% + 35px); /* Ajuste para 35px abaixo do texto */
+            height: 8px;
+            background-color: #349cd7;
+        }
+        .container {
+        width: 100%; /* Largura total da tela */
+        max-width: 1200px; /* Largura máxima */
+        height: 600PX
+        margin: 20px auto;
+        background-color: #e0e0e0;
+        display: flex;
+        flex-wrap: wrap; /* Permite que as colunas quebrem em várias linhas */
+        justify-content: space-between; /* Distribui as colunas uniformemente */
+    }
+
+.container > div {
+    flex: 0 0 30%; /* Cada coluna ocupa 30% da largura total */
+    background-color: #ccc;
+    border: 1px solid #999;
+    box-sizing: border-box; /* Garante que a borda não aumente a largura */
+    text-align: center;
+    padding: 10px;
+    margin-right: 20px; /* Espaçamento lateral entre as galerias */
+}
+        .button {
+            margin-top: 20px; /* Espaçamento acima do botão */
+        }
+        .toggle-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .toggle-btn:hover {
+            background-color: #0056b3;
+        }
+        .gallery {
+    display: none;
+    flex-wrap: wrap;
+    gap: 5px;
+        }
+        
+        .gallery.show {
+            display: flex;
+        }
+        .gallery img {
+            width: 214px;
+            height: 300px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .gallery img:hover {
+            opacity: 0.3;
+        }
+        body.modal-open {
+            overflow: hidden;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            overflow: auto; /* Adiciona barra de rolagem */
+            padding: 20px; /* Espaçamento interno para não ficar colado na borda */
+            box-sizing: border-box; /* Garante que o padding não altere as dimensões da modal */
+            text-align: center; /* Centraliza o conteúdo */
+        }
+        .modal-content {
+            position: relative;
+            display: inline-block;
+            max-width: 90%;
+            max-height: calc(100vh - 120px);
+        }
+        .modal-content img {
+            max-width: 100%; /* Imagem ocupa no máximo 100% da largura disponível */
+            max-height: 100%; /* Altura máxima é 100% da altura disponível */
+            object-fit: contain; /* Mantém a proporção da imagem */
+            border-radius: 8px;
+        }
+        .modal-caption {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+        }
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .nav-btn:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        
+        /* Estilo do footer */
+        footer {
+            width: 100%; /* Largura total da tela */
+            min-width: 300px; /* Largura mínima desejada */
+            height: auto; /* Altura ajustável conforme conteúdo */
+            background-color: #d3d3d3; /* Cor de fundo */
+            position: fixed; /* Fixa o footer na parte inferior da tela */
+            bottom: 0; /* Alinha o footer na parte inferior */
+            left: 0; /* Alinha o footer à esquerda */
+            text-align: center; /* Alinha o texto centralizado */
+        }
+
+        /* Estilo do texto no footer */
+        .footer-text {
+            position: relative; /* Posição relativa para ajustar internamente */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #000; /* Cor do texto */
+            font-size: 18px; /* Tamanho da fonte */
+            font-weight: bold; /* Negrito */
+            padding: 10px; /* Espaçamento interno */
+            background-color: rgba(0, 0, 0, 0.8); /* Cor de fundo com transparência */
+        }
+
+             /*Media Query para galleries em disponsitivos móveis */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  } 
+
+  .container > div { /* Essa regra deve ficar FORA do .container */
+    flex: 1 0 100%; 
+    margin-right: 0; 
+  }
+
+  .gallery img {
+    width: 100%; 
+    height: auto; 
+  }           
+}         
+    
+        /* Media Query para o footer dispositivos móveis */
+        @media (max-width: 768px) {
+            .footer-text {
+                font-size: 14px; /* Reduzindo o tamanho do texto para dispositivos móveis */
+                padding: 5px; /* Ajustando o padding para dispositivos móveis */
+            }
+        }
+
+    </style>
+    <script>
+        function toggleGalleryRH() {
+            var gallery = document.getElementById("imageGalleryRH");
+            gallery.classList.toggle("show");
+        }
+
+        function toggleGalleryTECNOLOGIA() {
+            var gallery = document.getElementById("imageGalleryTECNOLOGIA");
+            gallery.classList.toggle("show");
+        }
+
+        function toggleGalleryMARKETING() {
+            var gallery = document.getElementById("imageGalleryMARKETING");
+            gallery.classList.toggle("show");
+        }
+        
+        function openModal(image) {
+            var modal = document.getElementById("myModal");
+            var modalImg = document.getElementById("modalImg");
+            modal.style.display = "block";
+            modalImg.src = image.src;
+        }
+
+        function closeModal() {
+            var modal = document.getElementById("myModal");
+            modal.style.display = "none";
+        }
+    </script>
+</head>
+<body>
+
+<div class="header">
+    <img src="https://lh5.googleusercontent.com/WmRai_F90FfY2DmA2FhfT7qbGmLnH5VpBQUIgpGdR9eDR9DKKYuCYHmqz0sLb4HI3gSkN1F9TguuNHvlUqGWaEA" alt="Imagem de Cabeçalho">
+    <div class="header-text">Comunicados</div>
+    <div class="underline"></div>
+</div>
+ 
+<!-- Container principal -->
+<div class="container">
+    <!-- Primeiro botão RH dentro do container -->
+    <div class="button">
+        <button class="toggle-btn" onclick="toggleGalleryRH()">RH</button>
+    </div>
+
+    <!-- Galeria de imagens -->
+    <div class="gallery" id="imageGalleryRH">
+        <img src="https://lh3.googleusercontent.com/3EN6aADvPgWx13JZ_ylh19exLA4y4Jck8eDsVRrwys4DCC6eszJXNShNZK_J6lVXi61ZDsPvW82PM58_7V238Q" alt="Imagem 1" onclick="openModal(this)">
+        <img src="https://lh3.googleusercontent.com/3EN6aADvPgWx13JZ_ylh19exLA4y4Jck8eDsVRrwys4DCC6eszJXNShNZK_J6lVXi61ZDsPvW82PM58_7V238Q" alt="Imagem 2" onclick="openModal(this)">
+        <img src="https://lh3.googleusercontent.com/3EN6aADvPgWx13JZ_ylh19exLA4y4Jck8eDsVRrwys4DCC6eszJXNShNZK_J6lVXi61ZDsPvW82PM58_7V238Q" alt="Imagem 3" onclick="openModal(this)">
+    </div>
+
+     <!-- Segundo botão TECNOLOGIA dentro do container -->
+    <div class="button">
+        <button class="toggle-btn" onclick="toggleGalleryTECNOLOGIA()">TECNOLOGIA</button>
+    </div>
+
+    <!-- Galeria de imagens -->
+    <div class="gallery" id="imageGalleryTECNOLOGIA">
+        <img src="https://lh3.googleusercontent.com/3EN6aADvPgWx13JZ_ylh19exLA4y4Jck8eDsVRrwys4DCC6eszJXNShNZK_J6lVXi61ZDsPvW82PM58_7V238Q" alt="Imagem 1" onclick="openModal(this)">
+        <img src="https://lh3.googleusercontent.com/3EN6aADvPgWx13JZ_ylh19exLA4y4Jck8eDsVRrwys4DCC6eszJXNShNZK_J6lVXi61ZDsPvW82PM58_7V238Q" alt="Imagem 2" onclick="openModal(this)">
+        <img src="https://lh3.googleusercontent.com/3EN6aADvPgWx13JZ_ylh19exLA4y4Jck8eDsVRrwys4DCC6eszJXNShNZK_J6lVXi61ZDsPvW82PM58_7V238Q" alt="Imagem 3" onclick="openModal(this)">
+    </div>
+
+     <!-- Terceiro botão MARKETING dentro do container -->
+    <div class="button">
+        <button class="toggle-btn" onclick="toggleGalleryMARKETING()">MARKETING</button>
+    </div>
+
+    <!-- Galeria de imagens -->
+    <div class="gallery" id="imageGalleryMARKETING">
+        <img src="https://lh3.googleusercontent.com/3EN6aADvPgWx13JZ_ylh19exLA4y4Jck8eDsVRrwys4DCC6eszJXNShNZK_J6lVXi61ZDsPvW82PM58_7V238Q" alt="Imagem 1" onclick="openModal(this)">
+        <img src="https://lh3.googleusercontent.com/3EN6aADvPgWx13JZ_ylh19exLA4y4Jck8eDsVRrwys4DCC6eszJXNShNZK_J6lVXi61ZDsPvW82PM58_7V238Q" alt="Imagem 2" onclick="openModal(this)">
+        <img src="https://lh3.googleusercontent.com/3EN6aADvPgWx13JZ_ylh19exLA4y4Jck8eDsVRrwys4DCC6eszJXNShNZK_J6lVXi61ZDsPvW82PM58_7V238Q" alt="Imagem 3" onclick="openModal(this)">
+    </div>
+
+  
+</div>
+
+<!-- Modal -->
+<div id="myModal" class="modal">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <img class="modal-content" id="modalImg">
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-text">
+        <a href="mailto:rh@grupoaiz.com.br" style="color: #ffffff; text-decoration: none;">Recursos Humanos</a>
+    </div>
+</footer>
+
+</body>
+</html>
